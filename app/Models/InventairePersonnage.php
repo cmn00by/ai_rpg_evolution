@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-
 class InventairePersonnage extends Model
 {
     use HasFactory;
@@ -16,6 +14,7 @@ class InventairePersonnage extends Model
     protected $fillable = [
         'inventaire_id',
         'objet_id',
+        'personnage_id',
         'quantity',
         'durability',
         'is_equipped',
@@ -38,10 +37,12 @@ class InventairePersonnage extends Model
     /**
      * Get the personnage through inventaire.
      */
-    public function personnage(): HasOneThrough
+    public function personnage(): BelongsTo
     {
-        return $this->hasOneThrough(Personnage::class, Inventaire::class, 'id', 'id', 'inventaire_id', 'personnage_id');
+        return $this->belongsTo(Personnage::class, 'personnage_id', 'id');
     }
+
+
 
     /**
      * Get the objet that belongs to the inventory item.
