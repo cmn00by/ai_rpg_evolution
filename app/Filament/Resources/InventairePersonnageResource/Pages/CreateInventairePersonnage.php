@@ -16,8 +16,12 @@ class CreateInventairePersonnage extends CreateRecord
         // Récupérer l'inventaire_id du personnage sélectionné
         if (isset($data['personnage_id'])) {
             $personnage = Personnage::find($data['personnage_id']);
-            if ($personnage && $personnage->inventaire) {
-                $data['inventaire_id'] = $personnage->inventaire->id;
+
+            if ($personnage) {
+                // Créer un inventaire pour le personnage s'il n'existe pas
+                $inventaire = $personnage->inventaire ?? $personnage->inventaire()->create();
+
+                $data['inventaire_id'] = $inventaire->id;
             }
         }
         
