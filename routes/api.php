@@ -36,9 +36,29 @@ Route::middleware('auth:sanctum')->group(function () {
     // Récupérer l'historique des modifications (à implémenter)
     Route::get('/characters/{personnage}/stats/history', [CharacterStatsController::class, 'getStatsHistory']);
     
-    // Routes administrateur
-    Route::prefix('admin')->group(function () {
-        // Statistiques du cache
+    // Routes admin protégées
+    Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
         Route::get('/cache/stats', [CharacterStatsController::class, 'getCacheStats']);
     });
+});
+
+// Routes API pour l'espace joueur
+Route::middleware(['auth:sanctum', 'role:player|staff|admin'])->prefix('me')->group(function () {
+    // Informations du personnage actif
+    Route::get('/character', [App\Http\Controllers\Api\PlayerApiController::class, 'getCharacter']);
+    
+    // Inventaire
+    Route::get('/inventory', [App\Http\Controllers\Api\PlayerApiController::class, 'getInventory']);
+    Route::post('/inventory/equip', [App\Http\Controllers\Api\PlayerApiController::class, 'equipItem'])
+        ->middleware('throttle:equip');
+    Route::post('/inventory/unequip', [App\Http\Controllers\Api\PlayerApiController::class, 'unequipItem'])
+        ->middleware('throttle:equip');
+});
+
+// Routes API pour les boutiques
+Route::middleware(['auth:sanctum', 'role:player|staff|admin'])->group(function () {
+    Route::get('/shops', [App\Http\Controllers\Api\PlayerApiController::class, 'getShops']);
+    Route::get('/shops/{boutique}', [App\Http\Controllers\Api\PlayerApiController::class, 'getShopCatalog']);
+    Route::post('/shops/{boutique}/buy/{item}', [App\Http\Controllers\Api\PlayerApiController::class, 'buyItem'])
+        ->middleware('throttle:purchase');
 });

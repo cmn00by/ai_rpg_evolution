@@ -28,7 +28,8 @@ class Attribut extends Model
     public function classes()
     {
         return $this->belongsToMany(Classe::class, 'classe_attributs')
-            ->withPivot('base_value');
+            ->withPivot('base_value')
+            ->using(ClasseAttribut::class);
     }
 
     public function personnages()

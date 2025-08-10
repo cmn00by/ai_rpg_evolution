@@ -38,6 +38,14 @@ class Objet extends Model
     }
 
     /**
+     * Alias pour la relation avec la rareté (compatibilité)
+     */
+    public function rareteObjet(): BelongsTo
+    {
+        return $this->rarete();
+    }
+
+    /**
      * Relation avec le slot d'équipement
      */
     public function slot(): BelongsTo

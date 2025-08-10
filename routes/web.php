@@ -39,9 +39,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/character/{character}', [CharacterController::class, 'show'])->name('character.show');
 });
 
-// Routes joueur (nécessitent un personnage actif)
-Route::middleware(['auth', 'verified', 'active-character'])->prefix('player')->name('player.')->group(function () {
-    // Routes des boutiques, inventaire, etc. seront ajoutées ici
+// Routes pour l'espace joueur
+Route::prefix('player')->middleware(['auth', 'verified', 'role:player|staff|admin'])->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Player\PlayerDashboardController::class, 'index'])->name('player.dashboard');
+    Route::get('/dashboard/top-stats', [App\Http\Controllers\Player\PlayerDashboardController::class, 'getTopStats'])->name('player.dashboard.top-stats');
+    Route::get('/dashboard/equipped-items', [App\Http\Controllers\Player\PlayerDashboardController::class, 'getEquippedItems'])->name('player.dashboard.equipped-items');
+    Route::get('/dashboard/inventory-summary', [App\Http\Controllers\Player\PlayerDashboardController::class, 'getInventorySummary'])->name('player.dashboard.inventory-summary');
+    Route::get('/dashboard/recent-events', [App\Http\Controllers\Player\PlayerDashboardController::class, 'getRecentEvents'])->name('player.dashboard.recent-events');
+    Route::post('/dashboard/switch-character', [App\Http\Controllers\Player\PlayerDashboardController::class, 'switchCharacter'])->name('player.dashboard.switch-character');
+    
+    Route::get('/inventory', [App\Http\Controllers\Player\PlayerInventoryController::class, 'index'])->name('player.inventory');
+    Route::post('/inventory/equip', [App\Http\Controllers\Player\PlayerInventoryController::class, 'equip'])->name('player.inventory.equip');
+    Route::post('/inventory/unequip', [App\Http\Controllers\Player\PlayerInventoryController::class, 'unequip'])->name('player.inventory.unequip');
+    Route::post('/inventory/repair', [App\Http\Controllers\Player\PlayerInventoryController::class, 'repair'])->name('player.inventory.repair');
+    Route::get('/inventory/{item}', [App\Http\Controllers\Player\PlayerInventoryController::class, 'show'])->name('player.inventory.show');
+    
+    Route::get('/shops', [App\Http\Controllers\Player\PlayerShopController::class, 'index'])->name('player.shops');
+    Route::get('/shops/{boutique}', [App\Http\Controllers\Player\PlayerShopController::class, 'show'])->name('player.shops.show');
+    Route::post('/shops/{boutique}/buy', [App\Http\Controllers\Player\PlayerShopController::class, 'buy'])->name('player.shops.buy');
+    Route::post('/shops/{boutique}/sell', [App\Http\Controllers\Player\PlayerShopController::class, 'sell'])->name('player.shops.sell');
+    
+    Route::get('/history', [App\Http\Controllers\Player\PlayerHistoryController::class, 'index'])->name('player.history');
+    Route::get('/history/{transaction}', [App\Http\Controllers\Player\PlayerHistoryController::class, 'show'])->name('player.history.show');
+    Route::get('/history/stats/overview', [App\Http\Controllers\Player\PlayerHistoryController::class, 'getHistoryStats'])->name('player.history.stats');
+    Route::get('/history/export/csv', [App\Http\Controllers\Player\PlayerHistoryController::class, 'export'])->name('player.history.export');
 });
 
 // Routes d'administration

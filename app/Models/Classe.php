@@ -22,6 +22,7 @@ class Classe extends Model
     public function attributs()
     {
         return $this->belongsToMany(Attribut::class, 'classe_attributs')
-            ->withPivot('base_value');
+            ->withPivot('base_value')
+            ->using(ClasseAttribut::class);
     }
 }

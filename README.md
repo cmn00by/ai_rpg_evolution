@@ -12,12 +12,13 @@ Projet **RPG modulaire** sous Laravel 11 — gestion dynamique de classes, perso
 5. Structure du projet
 6. Modules
 7. Authentification & Autorisation
-8. Calculs & Cache
-9. Procédure Git/GitHub
-10. Commandes utiles
-11. Tests
-12. Roadmap
-13. Licence
+8. Back-office Admin (Filament)
+9. Calculs & Cache
+10. Procédure Git/GitHub
+11. Commandes utiles
+12. Tests
+13. Roadmap
+14. Licence
 
 ---
 
@@ -29,6 +30,7 @@ Ce projet implémente un **système RPG flexible et scalable**, où :
 - Les **objets/équipements** appliquent bonus/malus dynamiques.
 - L'**économie** gère boutiques, réapprovisionnement et transactions.
 - L'**authentification** et l'**autorisation** sécurisent l'accès aux fonctionnalités.
+- Le **back-office Filament** offre une interface d'administration complète et moderne.
 
 ---
 
@@ -69,6 +71,15 @@ php artisan migrate
 ```bash
 php artisan db:seed
 ```
+
+### 👥 Comptes par défaut
+Le seeder `RolePermissionSeeder` crée automatiquement les comptes suivants :
+
+- **Super Admin** : `superadmin@ai.rpg.com` / `password123`
+- **Admin** : `admin@ai.rpg.com` / `password123`
+- **Demo Player** : `demo@ai.rpg.com` / `password123`
+
+*Note : Ces comptes sont automatiquement vérifiés (pas besoin de confirmation email).*
 
 ---
 
@@ -146,28 +157,112 @@ database/
 
 ## 🔐 Authentification & Autorisation
 
-### Système de rôles ✅
-**Objectif :** sécuriser l'accès aux différentes parties de l'application selon les permissions utilisateur.
+### Système de rôles et permissions ✅
+**Objectif :** sécuriser l'accès aux différentes fonctionnalités selon le profil utilisateur.
 
-**Fonctionnalités implémentées :**
-- **Authentification Laravel Breeze** : système complet de connexion/inscription/déconnexion.
-- **Système de rôles** : gestion flexible des rôles utilisateur (player, admin, etc.).
-- **Attribution automatique** : les nouveaux utilisateurs reçoivent automatiquement le rôle "player".
-- **Middleware d'autorisation** : protection des routes selon les rôles requis.
-- **Interface d'administration** : dashboard admin avec statistiques et gestion.
-- **Tests de sécurité** : 6 tests couvrant l'authentification et l'autorisation.
+**Rôles configurés :**
+- **super-admin** : accès complet à toutes les fonctionnalités
+- **admin** : gestion des utilisateurs, personnages, objets et boutiques
+- **staff** : consultation des logs et modération
+- **player** : accès aux fonctionnalités de jeu (personnages, boutiques)
 
-**Architecture :**
-- `User` model avec relation many-to-many vers `Role`
-- `Role` model avec gestion des permissions
-- `AssignPlayerRole` listener pour attribution automatique
-- `AdminController` pour l'interface d'administration
-- Middleware de protection des routes sensibles
+**Permissions par module :**
+- **Gestion des attributs** : `manage-attributes` (super-admin, admin)
+- **Gestion des classes** : `manage-classes` (super-admin, admin)
+- **Gestion des objets** : `manage-items` (super-admin, admin)
+- **Gestion des boutiques** : `manage-shops` (super-admin, admin)
+- **Gestion des inventaires** : `manage-inventories` (super-admin, admin)
+- **Gestion des utilisateurs** : `manage-users` (super-admin, admin)
+- **Consultation des logs** : `view-logs` (super-admin, admin, staff)
+- **Accès au panel admin** : `view-admin-panel` (super-admin, admin)
 
-**Routes protégées :**
+**Protection des routes :**
 - `/characters/*` : accessible aux utilisateurs avec rôle "player"
 - `/admin/*` : accessible uniquement aux utilisateurs avec rôle "admin"
 - `/dashboard` : accessible aux utilisateurs authentifiés
+
+### 🎛️ Interfaces d'administration
+
+Le projet propose **deux interfaces d'administration distinctes** :
+
+#### 1. Interface personnalisée (`/admin/dashboard`)
+- **Accès** : `/admin/dashboard`
+- **Contrôleur** : `AdminController.php`
+- **Fonctionnalités** :
+  - Tableau de bord avec statistiques générales
+  - Gestion basique des utilisateurs
+  - Vue d'ensemble des personnages et boutiques
+  - Interface simple et légère
+
+#### 2. Interface Filament (`/admin`)
+- **Accès** : `/admin`
+- **Framework** : Filament (interface moderne)
+- **Fonctionnalités** : Interface complète de gestion (voir section dédiée ci-dessous)
+
+---
+
+## 🎛️ Back-office Admin (Filament)
+
+### Interface d'administration complète ✅
+**Accès :** `/admin` (réservé aux utilisateurs avec rôle "admin" ou "super-admin")
+
+**Objectif :** Interface d'administration moderne et intuitive basée sur Filament pour gérer tous les aspects du système RPG avec des fonctionnalités CRUD avancées.
+
+**Ressources Filament configurées :**
+
+#### 🏛️ ClasseResource
+- **Gestion des classes** : création, édition, suppression des classes de personnages
+- **Formulaires** : nom, slug, description, stats de base (force, agilité, intelligence, etc.)
+- **Table** : affichage avec recherche, tri et filtres par attributs
+- **Relation Manager** : gestion des attributs de classe avec valeurs min/max et types
+- **Actions** : duplication de classe, calcul automatique des stats
+
+#### 👤 PersonnageResource
+- **Gestion des personnages** : profils complets avec stats calculées
+- **Formulaires** : nom, classe, joueur, niveau, or, réputation, statut actif
+- **Création manuelle** : tous les champs sont éditables pour création personnalisée
+- **Relations** : inventaire, historique d'achats, attributs personnalisés
+- **Actions** : reset stats, gestion de l'équipement, calcul des bonus
+
+#### 💎 RareteObjetResource & 🎯 SlotEquipementResource
+- **Raretés d'objets** : gestion des niveaux de rareté avec couleurs et multiplicateurs
+- **Slots d'équipement** : configuration des emplacements d'équipement et limites
+- **Interface** : formulaires simplifiés avec validation et aperçu visuel
+
+#### ⚔️ ObjetResource
+- **Gestion des objets** : création d'armes, armures et objets avec attributs
+- **Formulaires** : nom, rareté, slot, prix, durabilité, stackable
+- **Relations** : modificateurs d'attributs, présence en boutiques
+- **Actions** : duplication d'objet, calcul des prix selon la rareté
+
+#### 🏪 BoutiqueResource
+- **Gestion des boutiques** : configuration complète des magasins
+- **Formulaires** : nom, taxes, remises, limites quotidiennes, fréquence de restock
+- **Relation Manager** : gestion des articles en boutique avec stocks et prix
+- **Actions** : restock manuel, gestion des stocks, configuration des prix
+
+#### 📊 AchatHistoriqueResource
+- **Historique des achats** : consultation en lecture seule des transactions
+- **Affichage** : détails complets des achats avec métadonnées
+- **Filtres** : par personnage, boutique, type de transaction, période
+- **Vue détaillée** : informations complètes sur chaque transaction
+
+#### 🎒 InventairePersonnageResource
+- **Gestion des inventaires** : vue d'ensemble des possessions des personnages
+- **Formulaires** : ajout/modification d'objets, gestion des quantités
+- **Actions** : équiper/déséquiper, réparer, gestion de la durabilité
+- **Filtres** : par personnage, rareté, slot d'équipement, statut d'équipement
+
+**Fonctionnalités avancées :**
+- **Navigation organisée** : regroupement logique par modules RPG
+- **Actions en lot** : opérations sur plusieurs enregistrements simultanément
+- **Notifications** : retours utilisateur pour toutes les actions importantes
+- **Validation** : contrôles de cohérence et règles métier intégrées
+- **Recherche globale** : recherche rapide dans toutes les ressources
+- **Filtres intelligents** : filtrage contextuel selon les relations
+- **Interface responsive** : adaptation mobile et desktop
+- **Relation Managers optimisés** : gestion correcte des relations many-to-many avec pivot
+- **Debugging intégré** : outils de débogage pour résoudre les problèmes d'affichage
 
 ---
 
@@ -221,11 +316,13 @@ git push -u origin feat/module-2-inventory
 ---
 
 ## 🛠 Commandes utiles
-- `php artisan migrate`
-- `php artisan migrate:fresh --seed`
-- `php artisan queue:work`
-- `php artisan tinker`
+- `php artisan migrate` (exécuter les migrations)
+- `php artisan migrate:fresh --seed` (réinitialiser la base avec données de test)
+- `php artisan db:seed --class=RolePermissionSeeder` (créer les rôles et comptes par défaut)
+- `php artisan queue:work` (traiter les tâches en arrière-plan)
+- `php artisan tinker` (console interactive Laravel)
 - `php artisan boutiques:restock` (réapprovisionnement manuel des boutiques)
+- `php artisan serve --host=0.0.0.0 --port=8000` (démarrer le serveur de développement)
 
 ---
 
@@ -263,7 +360,9 @@ git push -u origin feat/module-2-inventory
 - [x] **Authentification & Autorisation** — système complet de sécurité
 - [x] Tests complets (25 tests passants)
 - [x] Factories pour tous les modèles
-- [ ] Back‑office admin (Filament)
+- [x] **Back‑office admin (Filament)** — interface d'administration complète
+- [x] **Correction des RelationManagers** — résolution des problèmes d'affichage des attributs
+- [x] **Amélioration de l'interface de création** — formulaires entièrement fonctionnels
 - [ ] API publique (REST/GraphQL)
 - [ ] Système de combat
 - [ ] Quêtes et missions

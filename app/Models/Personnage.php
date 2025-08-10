@@ -48,6 +48,11 @@ class Personnage extends Model
         return $this->hasManyThrough(InventaireItem::class, Inventaire::class, 'personnage_id', 'inventaire_id');
     }
 
+    public function inventairePersonnages(): HasManyThrough
+    {
+        return $this->hasManyThrough(InventairePersonnage::class, Inventaire::class, 'personnage_id', 'inventaire_id');
+    }
+
     public function achatHistoriques(): HasMany
     {
         return $this->hasMany(AchatHistorique::class);

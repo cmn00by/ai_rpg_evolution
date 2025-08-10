@@ -22,21 +22,23 @@ class EnsureActiveCharacter
             return redirect()->route('login');
         }
 
-        // Vérifier si l'utilisateur a un personnage actif
-        if (!$user->active_character_id) {
-            return redirect()->route('character.select')
-                ->with('error', 'Vous devez sélectionner un personnage pour continuer.');
+        // Vérifier si l'utilisateur a un personnage actif en session
+        $activeCharacterId = session('active_character_id');
+        
+        if (!$activeCharacterId) {
+            return redirect()->route('characters.index')
+                ->with('warning', 'Vous devez sélectionner un personnage pour accéder à cette fonctionnalité.');
         }
 
         // Vérifier que le personnage actif appartient bien à l'utilisateur
-        $activeCharacter = Personnage::where('id', $user->active_character_id)
+        $activeCharacter = Personnage::where('id', $activeCharacterId)
             ->where('user_id', $user->id)
             ->first();
 
         if (!$activeCharacter) {
             // Le personnage actif n'existe plus ou n'appartient pas à l'utilisateur
-            $user->update(['active_character_id' => null]);
-            return redirect()->route('character.select')
+            session()->forget('active_character_id');
+            return redirect()->route('characters.index')
                 ->with('error', 'Le personnage sélectionné n\'est plus disponible.');
         }
 
