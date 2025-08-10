@@ -206,46 +206,46 @@ Le projet propose **deux interfaces d'administration distinctes** :
 ### Interface d'administration complète ✅
 **Accès :** `/admin` (réservé aux utilisateurs avec rôle "admin" ou "super-admin")
 
+**Comptes par défaut :**
+- `superadmin@ai.rpg.com` / `password123`
+- `admin@ai.rpg.com` / `password123`
+
 **Objectif :** Interface d'administration moderne et intuitive basée sur Filament pour gérer tous les aspects du système RPG avec des fonctionnalités CRUD avancées.
 
 **Ressources Filament configurées :**
 
 #### 🏛️ ClasseResource
-- **Gestion des classes** : création, édition, suppression des classes de personnages
-- **Formulaires** : nom, slug, description, stats de base (force, agilité, intelligence, etc.)
-- **Table** : affichage avec recherche, tri et filtres par attributs
-- **Relation Manager** : gestion des attributs de classe avec valeurs min/max et types
-- **Actions** : duplication de classe, calcul automatique des stats
+- **Gestion des classes** : création, édition et suppression
+- **Formulaires** : nom, slug, niveau de base
+- **Relation Manager** : attributs de classe
+- **Actions** : CRUD basique (duplication à venir)
 
 #### 👤 PersonnageResource
 - **Gestion des personnages** : profils complets avec stats calculées
 - **Formulaires** : nom, classe, joueur, niveau, or, réputation, statut actif
-- **Création manuelle** : tous les champs sont éditables pour création personnalisée
-- **Relations** : inventaire, historique d'achats, attributs personnalisés
-- **Actions** : reset stats, gestion de l'équipement, calcul des bonus
+- **Actions** : `set_active` (définir le personnage actif), `recalculate` (recalcul des stats — job dédié à implémenter)
+- **Relations** : à venir (inventaire, historique d'achats, attributs personnalisés)
 
 #### 💎 RareteObjetResource & 🎯 SlotEquipementResource
-- **Raretés d'objets** : gestion des niveaux de rareté avec couleurs et multiplicateurs
-- **Slots d'équipement** : configuration des emplacements d'équipement et limites
+- **Raretés d'objets** : niveaux de rareté avec couleurs et multiplicateurs
+- **Slots d'équipement** : emplacements d'équipement et limites
 - **Interface** : formulaires simplifiés avec validation et aperçu visuel
 
 #### ⚔️ ObjetResource
 - **Gestion des objets** : création d'armes, armures et objets avec attributs
 - **Formulaires** : nom, rareté, slot, prix, durabilité, stackable
 - **Relations** : modificateurs d'attributs, présence en boutiques
-- **Actions** : duplication d'objet, calcul des prix selon la rareté
+- **Actions** : `duplicate` (cloner un objet et ses attributs)
 
 #### 🏪 BoutiqueResource
-- **Gestion des boutiques** : configuration complète des magasins
-- **Formulaires** : nom, taxes, remises, limites quotidiennes, fréquence de restock
-- **Relation Manager** : gestion des articles en boutique avec stocks et prix
-- **Actions** : restock manuel, gestion des stocks, configuration des prix
+- **Gestion des boutiques** : configuration des magasins (nom, taxes, remises, restock, etc.)
+- **Relation Manager** : articles en boutique avec stocks et prix (`restock_item`)
+- **Actions** : `toggle_active` (activer/désactiver une boutique), `restock` (simule un restock — implémentation réelle à venir)
 
 #### 📊 AchatHistoriqueResource
 - **Historique des achats** : consultation en lecture seule des transactions
 - **Affichage** : détails complets des achats avec métadonnées
 - **Filtres** : par personnage, boutique, type de transaction, période
-- **Vue détaillée** : informations complètes sur chaque transaction
 
 #### 🎒 InventairePersonnageResource
 - **Gestion des inventaires** : vue d'ensemble des possessions des personnages
@@ -253,16 +253,14 @@ Le projet propose **deux interfaces d'administration distinctes** :
 - **Actions** : équiper/déséquiper, réparer, gestion de la durabilité
 - **Filtres** : par personnage, rareté, slot d'équipement, statut d'équipement
 
-**Fonctionnalités avancées :**
+**Fonctionnalités transversales :**
 - **Navigation organisée** : regroupement logique par modules RPG
 - **Actions en lot** : opérations sur plusieurs enregistrements simultanément
 - **Notifications** : retours utilisateur pour toutes les actions importantes
 - **Validation** : contrôles de cohérence et règles métier intégrées
 - **Recherche globale** : recherche rapide dans toutes les ressources
-- **Filtres intelligents** : filtrage contextuel selon les relations
+- **Filtres contextuels** : filtrage selon les relations
 - **Interface responsive** : adaptation mobile et desktop
-- **Relation Managers optimisés** : gestion correcte des relations many-to-many avec pivot
-- **Debugging intégré** : outils de débogage pour résoudre les problèmes d'affichage
 
 ---
 
