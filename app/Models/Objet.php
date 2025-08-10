@@ -54,6 +54,14 @@ class Objet extends Model
     }
 
     /**
+     * Alias pour la relation avec le slot (compatibilité)
+     */
+    public function slotEquipement(): BelongsTo
+    {
+        return $this->slot();
+    }
+
+    /**
      * Relation avec les modificateurs d'attributs
      */
     public function attributModifiers(): HasMany

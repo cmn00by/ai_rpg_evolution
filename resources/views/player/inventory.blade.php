@@ -75,10 +75,10 @@
                             <div class="flex justify-between items-start mb-3">
                                 <div class="flex-1">
                                     <h3 class="font-medium text-gray-900">{{ $item->objet->name }}</h3>
-                                    @if($item->objet->rareteObjet)
+                                    @if($item->objet->rarete)
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" 
-                                              style="background-color: {{ $item->objet->rareteObjet->color_hex }}20; color: {{ $item->objet->rareteObjet->color_hex }}">
-                                            {{ $item->objet->rareteObjet->name }}
+                                              style="background-color: {{ $item->objet->rarete->color_hex }}20; color: {{ $item->objet->rarete->color_hex }}">
+                                            {{ $item->objet->rarete->name }}
                                         </span>
                                     @endif
                                 </div>
@@ -91,10 +91,10 @@
 
                             <!-- Item Details -->
                             <div class="space-y-2 text-sm text-gray-600">
-                                @if($item->objet->slotEquipement)
+                                @if($item->objet->slot)
                                     <div class="flex justify-between">
                                         <span>Slot:</span>
-                                        <span class="font-medium">{{ $item->objet->slotEquipement->name }}</span>
+                                        <span class="font-medium">{{ $item->objet->slot->name }}</span>
                                     </div>
                                 @endif
                                 

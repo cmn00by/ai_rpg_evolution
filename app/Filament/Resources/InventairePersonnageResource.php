@@ -93,7 +93,7 @@ class InventairePersonnageResource extends Resource
                     ->searchable()
                     ->sortable(),
                     
-                BadgeColumn::make('objet.rareteObjet.name')
+                BadgeColumn::make('objet.rarete.name')
                     ->label('Rareté')
                     ->colors([
                         'secondary' => 'Commun',
@@ -103,7 +103,7 @@ class InventairePersonnageResource extends Resource
                     ])
                     ->sortable(),
                     
-                TextColumn::make('objet.slotEquipement.name')
+                TextColumn::make('objet.slot.name')
                     ->label('Slot')
                     ->sortable()
                     ->toggleable(),
@@ -147,14 +147,28 @@ class InventairePersonnageResource extends Resource
                     ->relationship('personnage', 'name')
                     ->searchable(),
                     
-                SelectFilter::make('objet.rarete_objet_id')
+                SelectFilter::make('rarete_id')
                     ->label('Rareté')
-                    ->relationship('objet.rareteObjet', 'name')
+                    ->options(\App\Models\RareteObjet::pluck('name', 'id'))
+                    ->query(fn ($query, $data) => 
+                        $query->when($data['value'], fn ($q) => 
+                            $q->whereHas('objet', fn ($subQuery) => 
+                                $subQuery->where('rarete_id', $data['value'])
+                            )
+                        )
+                    )
                     ->searchable(),
                     
-                SelectFilter::make('objet.slot_equipement_id')
+                SelectFilter::make('slot_id')
                     ->label('Slot d\'équipement')
-                    ->relationship('objet.slotEquipement', 'name')
+                    ->options(\App\Models\SlotEquipement::pluck('name', 'id'))
+                    ->query(fn ($query, $data) => 
+                        $query->when($data['value'], fn ($q) => 
+                            $q->whereHas('objet', fn ($subQuery) => 
+                                $subQuery->where('slot_id', $data['value'])
+                            )
+                        )
+                    )
                     ->searchable(),
                     
                 SelectFilter::make('is_equipped')
@@ -171,7 +185,7 @@ class InventairePersonnageResource extends Resource
                     ->label('Équiper')
                     ->icon('heroicon-o-shield-check')
                     ->color('success')
-                    ->visible(fn ($record) => !$record->is_equipped && $record->objet?->slotEquipement)
+                    ->visible(fn ($record) => !$record->is_equipped && $record->objet?->slot)
                     ->requiresConfirmation()
                     ->modalHeading('Équiper cet objet')
                     ->modalSubheading('Cet objet sera équipé et remplacera l\'objet actuellement équipé dans ce slot.')
@@ -179,7 +193,7 @@ class InventairePersonnageResource extends Resource
                         // Déséquiper les autres objets du même slot
                         InventairePersonnage::where('personnage_id', $record->personnage_id)
                             ->whereHas('objet', function ($query) use ($record) {
-                                $query->where('slot_equipement_id', $record->objet->slot_equipement_id);
+                                $query->where('slot_id', $record->objet->slot_id);
                             })
                             ->update(['is_equipped' => false]);
                             

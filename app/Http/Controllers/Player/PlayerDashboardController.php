@@ -77,7 +77,7 @@ class PlayerDashboardController extends Controller
     {
         return InventairePersonnage::where('personnage_id', $character->id)
             ->where('is_equipped', true)
-            ->with(['objet.rareteObjet', 'objet.slotEquipement'])
+            ->with(['objet.rarete', 'objet.slot'])
             ->get();
     }
 

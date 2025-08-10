@@ -25,7 +25,7 @@ class PlayerHistoryController extends Controller
         }
 
         $query = AchatHistorique::where('personnage_id', $activeCharacter->id)
-            ->with(['boutique', 'objet.rareteObjet']);
+            ->with(['boutique', 'objet.rarete']);
 
         // Filtres
         if ($request->filled('type')) {
@@ -82,7 +82,7 @@ class PlayerHistoryController extends Controller
             abort(403, 'Cette transaction ne vous appartient pas.');
         }
 
-        $transaction->load(['boutique', 'objet.rareteObjet', 'objet.slotEquipement']);
+        $transaction->load(['boutique', 'objet.rarete', 'objet.slot']);
         
         // Décoder les métadonnées
         $metadata = json_decode($transaction->meta_json, true) ?? [];

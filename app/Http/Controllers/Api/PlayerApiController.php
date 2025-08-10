@@ -38,7 +38,7 @@ class PlayerApiController extends Controller
             'personnageAttributsCache.attribut',
             'inventairePersonnages' => function ($query) {
                 $query->where('is_equipped', true)
-                    ->with(['objet.rareteObjet', 'objet.slotEquipement']);
+                    ->with(['objet.rarete', 'objet.slot']);
             }
         ]);
 
@@ -59,8 +59,8 @@ class PlayerApiController extends Controller
                 'object' => [
                     'id' => $item->objet->id,
                     'name' => $item->objet->name,
-                    'rarity' => $item->objet->rareteObjet->name ?? null,
-                    'slot' => $item->objet->slotEquipement->name ?? null
+                    'rarity' => $item->objet->rarete->name ?? null,
+                    'slot' => $item->objet->slot->name ?? null
                 ],
                 'quantity' => $item->quantite,
                 'durability' => $item->durability_current
@@ -101,7 +101,7 @@ class PlayerApiController extends Controller
         }
 
         $query = InventairePersonnage::where('personnage_id', $character->id)
-            ->with(['objet.rareteObjet', 'objet.slotEquipement']);
+            ->with(['objet.rarete', 'objet.slot']);
 
         // Filtres
         if ($request->filled('equipped')) {
@@ -131,13 +131,13 @@ class PlayerApiController extends Controller
                     'id' => $item->objet->id,
                     'name' => $item->objet->name,
                     'rarity' => [
-                        'id' => $item->objet->rareteObjet->id ?? null,
-                        'name' => $item->objet->rareteObjet->name ?? null,
-                        'color' => $item->objet->rareteObjet->color_hex ?? null
+                        'id' => $item->objet->rarete->id ?? null,
+                        'name' => $item->objet->rarete->name ?? null,
+                        'color' => $item->objet->rarete->color_hex ?? null
                     ],
                     'slot' => [
-                        'id' => $item->objet->slotEquipement->id ?? null,
-                        'name' => $item->objet->slotEquipement->name ?? null
+                        'id' => $item->objet->slot->id ?? null,
+                        'name' => $item->objet->slot->name ?? null
                     ],
                     'stackable' => $item->objet->stackable,
                     'base_durability' => $item->objet->base_durability
@@ -182,7 +182,7 @@ class PlayerApiController extends Controller
 
         $item = InventairePersonnage::where('id', $request->item_id)
             ->where('personnage_id', $character->id)
-            ->with('objet.slotEquipement')
+            ->with('objet.slot')
             ->first();
 
         if (!$item) {
@@ -208,7 +208,7 @@ class PlayerApiController extends Controller
 
         try {
             DB::transaction(function () use ($item, $character) {
-                $slot = $item->objet->slotEquipement;
+                $slot = $item->objet->slot;
                 
                 if ($slot) {
                     $currentEquipped = InventairePersonnage::where('personnage_id', $character->id)
@@ -371,7 +371,7 @@ class PlayerApiController extends Controller
         $query = BoutiqueItem::where('boutique_id', $boutique->id)
             ->where('is_active', true)
             ->where('stock_quantity', '>', 0)
-            ->with(['objet.rareteObjet', 'objet.slotEquipement']);
+            ->with(['objet.rarete', 'objet.slot']);
 
         // Filtres
         if ($request->filled('rarity_id')) {
@@ -401,13 +401,13 @@ class PlayerApiController extends Controller
                     'id' => $item->objet->id,
                     'name' => $item->objet->name,
                     'rarity' => [
-                        'id' => $item->objet->rareteObjet->id ?? null,
-                        'name' => $item->objet->rareteObjet->name ?? null,
-                        'color' => $item->objet->rareteObjet->color_hex ?? null
+                        'id' => $item->objet->rarete->id ?? null,
+                        'name' => $item->objet->rarete->name ?? null,
+                        'color' => $item->objet->rarete->color_hex ?? null
                     ],
                     'slot' => [
-                        'id' => $item->objet->slotEquipement->id ?? null,
-                        'name' => $item->objet->slotEquipement->name ?? null
+                        'id' => $item->objet->slot->id ?? null,
+                        'name' => $item->objet->slot->name ?? null
                     ]
                 ],
                 'stock_quantity' => $item->stock_quantity,

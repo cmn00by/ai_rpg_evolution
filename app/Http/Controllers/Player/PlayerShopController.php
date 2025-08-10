@@ -63,7 +63,7 @@ class PlayerShopController extends Controller
         $query = BoutiqueItem::where('boutique_id', $boutique->id)
             ->where('is_active', true)
             ->where('stock_quantity', '>', 0)
-            ->with(['objet.rareteObjet', 'objet.slotEquipement']);
+            ->with(['objet.rarete', 'objet.slot']);
 
         // Filtres
         if ($request->filled('rarity')) {

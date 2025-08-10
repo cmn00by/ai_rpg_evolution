@@ -28,7 +28,7 @@ class PlayerInventoryController extends Controller
         }
 
         $query = InventairePersonnage::where('personnage_id', $activeCharacter->id)
-            ->with(['objet.rareteObjet', 'objet.slotEquipement', 'objet.objetAttributs.attribut']);
+            ->with(['objet.rarete', 'objet.slot', 'objet.objetAttributs.attribut']);
 
         // Filtres
         if ($request->filled('rarity')) {
@@ -99,7 +99,7 @@ class PlayerInventoryController extends Controller
         }
 
         DB::transaction(function () use ($item, $activeCharacter) {
-            $slot = $item->objet->slotEquipement;
+            $slot = $item->objet->slot;
             
             if ($slot) {
                 // Vérifier les limites de slot
@@ -268,7 +268,7 @@ class PlayerInventoryController extends Controller
             abort(403, 'Cet objet ne vous appartient pas.');
         }
 
-        $item->load(['objet.rareteObjet', 'objet.slotEquipement', 'objet.objetAttributs.attribut']);
+        $item->load(['objet.rarete', 'objet.slot', 'objet.objetAttributs.attribut']);
 
         return view('player.inventory.show', compact('item', 'activeCharacter'));
     }

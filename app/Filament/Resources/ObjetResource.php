@@ -59,15 +59,15 @@ class ObjetResource extends Resource
                             
                         Grid::make(2)
                             ->schema([
-                                Select::make('rarete_objet_id')
+                                Select::make('rarete_id')
                                     ->label('Rareté')
-                                    ->relationship('rareteObjet', 'name')
+                                    ->relationship('rarete', 'name')
                                     ->required()
                                     ->searchable(),
                                     
-                                Select::make('slot_equipement_id')
+                                Select::make('slot_id')
                                     ->label('Slot d\'équipement')
-                                    ->relationship('slotEquipement', 'name')
+                                    ->relationship('slot', 'name')
                                     ->nullable()
                                     ->searchable()
                                     ->helperText('Laisser vide pour les objets non équipables'),
@@ -119,13 +119,13 @@ class ObjetResource extends Resource
                     ->searchable()
                     ->sortable(),
                     
-                BadgeColumn::make('rareteObjet.name')
+                BadgeColumn::make('rarete.name')
                     ->label('Rareté')
                     ->colors(fn ($record) => [
-                        $record->rareteObjet?->color_hex ?? '#6B7280' => $record->rareteObjet?->name,
+                        $record->rarete?->color_hex ?? '#6B7280' => $record->rarete?->name,
                     ]),
                     
-                TextColumn::make('slotEquipement.name')
+                TextColumn::make('slot.name')
                     ->label('Slot')
                     ->placeholder('Non équipable')
                     ->sortable(),
@@ -155,13 +155,13 @@ class ObjetResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('rarete_objet_id')
+                Tables\Filters\SelectFilter::make('rarete_id')
                     ->label('Rareté')
-                    ->relationship('rareteObjet', 'name'),
+                    ->relationship('rarete', 'name'),
                     
-                Tables\Filters\SelectFilter::make('slot_equipement_id')
+                Tables\Filters\SelectFilter::make('slot_id')
                     ->label('Slot')
-                    ->relationship('slotEquipement', 'name'),
+                    ->relationship('slot', 'name'),
                     
                 Tables\Filters\TernaryFilter::make('stackable')
                     ->label('Empilable'),

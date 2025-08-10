@@ -48,7 +48,7 @@ class InventairePersonnage extends Model
      */
     public function objet(): BelongsTo
     {
-        return $this->belongsTo(Objet::class);
+        return $this->belongsTo(Objet::class, 'objet_id');
     }
 
     /**

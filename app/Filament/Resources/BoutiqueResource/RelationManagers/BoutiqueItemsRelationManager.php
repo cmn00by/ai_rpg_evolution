@@ -103,10 +103,10 @@ class BoutiqueItemsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                     
-                BadgeColumn::make('objet.rareteObjet.name')
+                BadgeColumn::make('objet.rarete.name')
                     ->label('Rareté')
                     ->colors(fn ($record) => [
-                        $record->objet?->rareteObjet?->color_hex ?? '#6B7280' => $record->objet?->rareteObjet?->name,
+                        $record->objet?->rarete?->color_hex ?? '#6B7280' => $record->objet?->rarete?->name,
                     ]),
                     
                 TextColumn::make('stock')
@@ -151,9 +151,16 @@ class BoutiqueItemsRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('objet.rarete_objet_id')
+                Tables\Filters\SelectFilter::make('rarete_id')
                     ->label('Rareté')
-                    ->relationship('objet.rareteObjet', 'name'),
+                    ->options(\App\Models\RareteObjet::pluck('name', 'id'))
+                    ->query(fn ($query, $data) => 
+                        $query->when($data['value'], fn ($q) => 
+                            $q->whereHas('objet', fn ($subQuery) => 
+                                $subQuery->where('rarete_id', $data['value'])
+                            )
+                        )
+                    ),
                     
                 Tables\Filters\TernaryFilter::make('allow_buy')
                     ->label('Achat autorisé'),
