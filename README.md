@@ -98,8 +98,8 @@ database/
 - Pivots `classe_attributs` et `personnage_attributs`.
 - Cache des stats finales dans `personnage_attributs_cache`.
 
-### Module 2 — Raretés · Slots · Objets · Inventaire (Étape 6)
-**Objectif :** gérer objets/équipements et inventaires, avec bonus/malus d’attributs.
+### Module 2 — Raretés · Slots · Objets · Inventaire ✅
+**Objectif :** gérer objets/équipements et inventaires, avec bonus/malus d'attributs.
 
 **Schéma** (tables principales) :
 - `raretes_objets` : `name`, `slug` (unique), `order`, `color_hex`, `multiplier`.
@@ -110,10 +110,10 @@ database/
 - `inventaire_items` : `inventaire_id`, `objet_id`, `quantity`, `durability` (nullable), `is_equipped` (bool), timestamps.
 
 **Règles métier :**
-- **Équipement** : respecter `max_per_slot`. Les % s’additionnent (10% + 15% = 25%). Les **flats s’appliquent avant %**.
+- **Équipement** : respecter `max_per_slot`. Les % s'additionnent (10% + 15% = 25%). Les **flats s'appliquent avant %**.
 - **Stackable** : fusion en inventaire si non équipé ; pour équiper une unité, dé‑stacker au besoin.
 - **Durabilité** : si 0 ⇒ auto‑déséquipement (optionnel), évènement `ItemBroken`.
-- **Intégrité** : toutes les opérations d’inventaire/équipement en **transaction** ; verrous sur la ligne cible si concurrence.
+- **Intégrité** : toutes les opérations d'inventaire/équipement en **transaction** ; verrous sur la ligne cible si concurrence.
 
 **Events conseillés :**
 `ItemEquipped`, `ItemUnequipped`, `ItemBroken`, `InventoryMerged`. Chaque listener invalide/recalcule **uniquement** les attributs impactés.
@@ -123,9 +123,22 @@ database/
 - Slots : Tête, Torse, Arme, Anneau (max 2), Bottes.
 - Objets : quelques épées/anneaux/armures avec 1–2 modificateurs.
 
-### Module 3 — Économie
-- Boutiques configurables (slots/raretés autorisés, stock & restock).
-- Historique des achats, transactions atomiques.
+### Module 3 — Économie ✅
+**Objectif :** système économique complet avec boutiques, transactions et historique.
+
+**Schéma** (tables principales) :
+- `boutiques` : `name`, `description`, `tax_rate`, `discount_rate`, `max_daily_purchases`, `restock_frequency_hours`, `allowed_raretes`, `allowed_slots`.
+- `boutique_items` : `boutique_id`, `objet_id`, `stock_quantity`, `base_price`, `is_active`, timestamps.
+- `achat_historiques` : `personnage_id`, `boutique_id`, `objet_id`, `quantity`, `unit_price`, `total_price`, `meta_json`, timestamps.
+
+**Fonctionnalités implémentées :**
+- **Système de boutiques** : configuration flexible avec taxes, remises et limites quotidiennes.
+- **Gestion des stocks** : réapprovisionnement automatique programmé.
+- **Transactions sécurisées** : validation des fonds, gestion des erreurs, transactions atomiques.
+- **Historique complet** : tracking détaillé des achats avec métadonnées (soldes avant/après, taxes, remises).
+- **Intégration inventaire** : ajout automatique des objets achetés à l'inventaire du personnage.
+- **Système de réputation** : influence sur les prix et accès aux boutiques.
+- **Tests complets** : 12 tests couvrant tous les cas d'usage et erreurs.
 
 ---
 
@@ -183,12 +196,21 @@ git push -u origin feat/module-2-inventory
 - `php artisan migrate:fresh --seed`
 - `php artisan queue:work`
 - `php artisan tinker`
+- `php artisan boutiques:restock` (réapprovisionnement manuel des boutiques)
 
 ---
 
 ## 🧪 Tests
 - Framework : PestPHP
 - Lancer les tests : `php artisan test`
+- **Couverture actuelle :**
+  - ✅ BoutiqueTest : 12 tests couvrant l'ensemble du système économique
+  - ✅ Tests d'achat avec validation des fonds
+  - ✅ Tests de gestion des stocks et réapprovisionnement
+  - ✅ Tests des limites quotidiennes et réputation
+  - ✅ Tests de l'historique des achats avec métadonnées
+  - ✅ Tests d'intégration inventaire/boutique
+  - ✅ Gestion des erreurs et cas limites
 
 ---
 
@@ -196,11 +218,16 @@ git push -u origin feat/module-2-inventory
 - [x] Module 1 — migrations, modèles, seeders
 - [x] Observers/Events sync attributs
 - [x] Calcul stats finales + cache
-- [ ] Module 2 — Objets/Équipements (en cours)
-- [ ] Module 3 — Économie/Boutiques
+- [x] Module 2 — Objets/Équipements/Inventaires
+- [x] Module 3 — Économie/Boutiques complète
+- [x] Tests complets (12 tests passants)
+- [x] Factories pour tous les modèles
 - [ ] Back‑office admin (Filament)
 - [ ] API publique (REST/GraphQL)
 - [ ] Authentification & sécurité avancée
+- [ ] Système de combat
+- [ ] Quêtes et missions
+- [ ] Guildes et interactions sociales
 
 ---
 
