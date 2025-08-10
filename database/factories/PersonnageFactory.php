@@ -16,6 +16,7 @@ class PersonnageFactory extends Factory
             'name'      => fake()->firstName(),
             'level'     => 1,
             'gold'      => fake()->numberBetween(0, 500),
+            'is_active' => true,
         ];
     }
 }

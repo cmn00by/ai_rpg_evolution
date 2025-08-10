@@ -10,8 +10,14 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-    protected function schedule(Schedule $schedule): void
+    protected function schedule(Schedule $schedule)
     {
+        // Réapprovisionnement automatique des boutiques tous les jours à 3h du matin
+        $schedule->command('boutiques:restock')
+                 ->dailyAt('03:00')
+                 ->withoutOverlapping()
+                 ->runInBackground();
+        
         // $schedule->command('inspire')->hourly();
     }
 
