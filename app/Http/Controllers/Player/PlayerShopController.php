@@ -351,6 +351,7 @@ class PlayerShopController extends Controller
 
         // Créer une nouvelle entrée
         InventairePersonnage::create([
+            'inventaire_id' => $character->inventaire->id,
             'personnage_id' => $character->id,
             'objet_id' => $objet->id,
             'quantite' => $quantity,

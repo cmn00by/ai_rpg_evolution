@@ -121,6 +121,7 @@ class PlayerInventoryController extends Controller
             if ($item->objet->stackable && $item->quantite > 1) {
                 // Créer une nouvelle entrée pour l'objet équipé
                 InventairePersonnage::create([
+                    'inventaire_id' => $activeCharacter->inventaire->id,
                     'personnage_id' => $activeCharacter->id,
                     'objet_id' => $item->objet_id,
                     'quantite' => 1,

@@ -225,12 +225,13 @@ class PlayerApiController extends Controller
 
                 if ($item->objet->stackable && $item->quantite > 1) {
                     InventairePersonnage::create([
-                        'personnage_id' => $character->id,
-                        'objet_id' => $item->objet_id,
-                        'quantite' => 1,
-                        'is_equipped' => true,
-                        'durability_current' => $item->durability_current
-                    ]);
+                    'inventaire_id' => $character->inventaire->id,
+                    'personnage_id' => $character->id,
+                    'objet_id' => $item->objet_id,
+                    'quantite' => 1,
+                    'is_equipped' => true,
+                    'durability_current' => $item->durability_current
+                ]);
 
                     $item->update(['quantite' => $item->quantite - 1]);
                 } else {
@@ -591,6 +592,7 @@ class PlayerApiController extends Controller
         }
 
         InventairePersonnage::create([
+            'inventaire_id' => $character->inventaire->id,
             'personnage_id' => $character->id,
             'objet_id' => $objet->id,
             'quantite' => $quantity,
