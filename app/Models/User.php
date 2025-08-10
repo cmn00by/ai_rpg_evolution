@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'active_character_id',
     ];
 
     /**
@@ -49,16 +51,26 @@ class User extends Authenticatable
     }
 
     /**
-     * Vérifie si l'utilisateur est administrateur
-     * TODO: Implémenter un système de rôles plus sophistiqué
+     * Relation vers le personnage actif
+     */
+    public function activeCharacter()
+    {
+        return $this->belongsTo(Personnage::class, 'active_character_id');
+    }
+
+    /**
+     * Vérifie si l'utilisateur a un rôle admin
      */
     public function isAdmin(): bool
     {
-        // Pour l'instant, simple vérification par email
-        // À remplacer par un système de rôles approprié
-        return in_array($this->email, [
-            'admin@example.com',
-            'dev@example.com'
-        ]);
+        return $this->hasAnyRole(['super-admin', 'admin']);
+    }
+
+    /**
+     * Vérifie si l'utilisateur a un rôle staff ou plus
+     */
+    public function isStaff(): bool
+    {
+        return $this->hasAnyRole(['super-admin', 'admin', 'staff']);
     }
 }

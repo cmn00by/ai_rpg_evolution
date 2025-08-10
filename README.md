@@ -11,12 +11,13 @@ Projet **RPG modulaire** sous Laravel 11 — gestion dynamique de classes, perso
 4. Configuration
 5. Structure du projet
 6. Modules
-7. Calculs & Cache
-8. Procédure Git/GitHub
-9. Commandes utiles
-10. Tests
-11. Roadmap
-12. Licence
+7. Authentification & Autorisation
+8. Calculs & Cache
+9. Procédure Git/GitHub
+10. Commandes utiles
+11. Tests
+12. Roadmap
+13. Licence
 
 ---
 
@@ -26,7 +27,8 @@ Ce projet implémente un **système RPG flexible et scalable**, où :
 - Les **classes** possèdent des stats de base.
 - Les **personnages** héritent des stats de leur classe + modificateurs.
 - Les **objets/équipements** appliquent bonus/malus dynamiques.
-- L’**économie** gère boutiques, réapprovisionnement et transactions.
+- L'**économie** gère boutiques, réapprovisionnement et transactions.
+- L'**authentification** et l'**autorisation** sécurisent l'accès aux fonctionnalités.
 
 ---
 
@@ -142,6 +144,33 @@ database/
 
 ---
 
+## 🔐 Authentification & Autorisation
+
+### Système de rôles ✅
+**Objectif :** sécuriser l'accès aux différentes parties de l'application selon les permissions utilisateur.
+
+**Fonctionnalités implémentées :**
+- **Authentification Laravel Breeze** : système complet de connexion/inscription/déconnexion.
+- **Système de rôles** : gestion flexible des rôles utilisateur (player, admin, etc.).
+- **Attribution automatique** : les nouveaux utilisateurs reçoivent automatiquement le rôle "player".
+- **Middleware d'autorisation** : protection des routes selon les rôles requis.
+- **Interface d'administration** : dashboard admin avec statistiques et gestion.
+- **Tests de sécurité** : 6 tests couvrant l'authentification et l'autorisation.
+
+**Architecture :**
+- `User` model avec relation many-to-many vers `Role`
+- `Role` model avec gestion des permissions
+- `AssignPlayerRole` listener pour attribution automatique
+- `AdminController` pour l'interface d'administration
+- Middleware de protection des routes sensibles
+
+**Routes protégées :**
+- `/characters/*` : accessible aux utilisateurs avec rôle "player"
+- `/admin/*` : accessible uniquement aux utilisateurs avec rôle "admin"
+- `/dashboard` : accessible aux utilisateurs authentifiés
+
+---
+
 ## 📊 Calculs & Cache
 **Ordre d’application recommandé :**
 ```
@@ -204,13 +233,24 @@ git push -u origin feat/module-2-inventory
 - Framework : PestPHP
 - Lancer les tests : `php artisan test`
 - **Couverture actuelle :**
-  - ✅ BoutiqueTest : 12 tests couvrant l'ensemble du système économique
-  - ✅ Tests d'achat avec validation des fonds
-  - ✅ Tests de gestion des stocks et réapprovisionnement
-  - ✅ Tests des limites quotidiennes et réputation
-  - ✅ Tests de l'historique des achats avec métadonnées
-  - ✅ Tests d'intégration inventaire/boutique
-  - ✅ Gestion des erreurs et cas limites
+  - ✅ **AuthenticationTest** : 7 tests couvrant l'authentification complète
+    - Tests de connexion/déconnexion
+    - Tests d'inscription utilisateur
+    - Tests d'accès aux pages protégées
+    - Tests de redirection après authentification
+  - ✅ **RoleAuthorizationTest** : 6 tests couvrant l'autorisation par rôles
+    - Attribution automatique du rôle "player"
+    - Protection des routes admin
+    - Accès conditionnel selon les rôles
+    - Tests de sécurité et permissions
+  - ✅ **BoutiqueTest** : 12 tests couvrant l'ensemble du système économique
+    - Tests d'achat avec validation des fonds
+    - Tests de gestion des stocks et réapprovisionnement
+    - Tests des limites quotidiennes et réputation
+    - Tests de l'historique des achats avec métadonnées
+    - Tests d'intégration inventaire/boutique
+    - Gestion des erreurs et cas limites
+  - ✅ **Total : 25 tests passants avec 25 assertions**
 
 ---
 
@@ -220,14 +260,16 @@ git push -u origin feat/module-2-inventory
 - [x] Calcul stats finales + cache
 - [x] Module 2 — Objets/Équipements/Inventaires
 - [x] Module 3 — Économie/Boutiques complète
-- [x] Tests complets (12 tests passants)
+- [x] **Authentification & Autorisation** — système complet de sécurité
+- [x] Tests complets (25 tests passants)
 - [x] Factories pour tous les modèles
 - [ ] Back‑office admin (Filament)
 - [ ] API publique (REST/GraphQL)
-- [ ] Authentification & sécurité avancée
 - [ ] Système de combat
 - [ ] Quêtes et missions
 - [ ] Guildes et interactions sociales
+- [ ] Système de notifications
+- [ ] Interface utilisateur avancée
 
 ---
 

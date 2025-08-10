@@ -9,7 +9,9 @@ class ClasseFactory extends Factory
 {
     public function definition(): array
     {
-        $name = fake()->unique()->randomElement(['Guerrier','Voleur','Mage','Ranger']);
+        $classes = ['Guerrier', 'Voleur', 'Mage', 'Ranger', 'Paladin', 'Archer', 'Assassin', 'Prêtre'];
+        $name = $this->faker->randomElement($classes) . ' ' . $this->faker->randomNumber(3);
+        
         return [
             'name' => $name,
             'slug' => Str::slug($name),
